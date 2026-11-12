@@ -1,0 +1,2 @@
+en-IN-NeerjaNeural
+Turn and zoom. Touch and move to rotate. Touch labels and objects. Pinch to zoom.

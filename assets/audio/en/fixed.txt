@@ -1,0 +1,2 @@
+en-IN-NeerjaNeural
+At some joints, the bones cannot move. These are fixed joints. The bones of the head (skull) are joined by fixed joints. There is also a fixed joint between the upper jaw and the rest of the head.

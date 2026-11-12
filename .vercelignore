@@ -1,0 +1,8 @@
+# not part of the deployed game: design sources, dev tooling, docs, build caches
+
+scripts/
+docs/
+README.md
+package.json
+assets/audio/**/*.txt
+.DS_Store

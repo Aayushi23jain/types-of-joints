@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Types of Joints</title>
+<link rel="icon" type="image/webp" href="assets/img/favicon.webp">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/img/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#030c29">
+<link rel="preload" href="assets/fonts/poppins-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css">
+<script>try { var th = localStorage.getItem("joints-theme"); if (th === "light" || th === "dark") document.documentElement.dataset.theme = th; } catch (e) {}</script>
+<!-- Three.js is vendored (vendor/three, r160.1) so the game also runs on school networks that block or throttle CDNs -->
+<script type="importmap">{"imports":{"three":"./vendor/three/core/three.module.min.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
+<script>
+// Boot watchdog: if the app modules fail to load (or never finish booting) show an error with a Retry button instead of an endless "Loading…".
+window.bootFail = function (msg) {
+  var l = document.getElementById('load'); if (!l || l.dataset.err) return; l.dataset.err = '1'; l.classList.remove('h');
+  var Q = new URLSearchParams(location.search), L = (Q.get('lang') || Q.get('lan') || Q.get('lng') || 'en').toLowerCase(), J = window.bootText || {}, T = J[(J.aliases || {})[L] || L] || J.en;
+  var M = T ? [T.errLoad, T.retry] : ['Could not load the simulation. Please check your internet connection and try again.', 'Retry'];   // English only if even strings.json failed
+  var t = document.getElementById('loadText'); if (t) t.textContent = msg || M[0];
+  var b = document.getElementById('loadRetry'); if (b) { b.hidden = false; if (!msg) b.textContent = M[1]; }
+};
+// watchdog: fail only when loading STALLS (no progress for 45 s), not when a slow connection is still downloading
+window.bootPoke = function () { clearTimeout(window.bootTimer); window.bootTimer = setTimeout(function () { window.bootFail(); }, 45000); };
+window.bootPoke();
+fetch('assets/text/strings.json').then(function (r) { return r.json(); }).then(function (j) { window.bootText = j; }).catch(function () {});   // error text in the student's language
+</script></head>
+<body><canvas id="c" role="img" aria-label="3D model of a human skeleton"></canvas><div class="vignette" aria-hidden="true"></div><div id="labels"></div>
+<header id="identity"><h1 id="idTitle"></h1></header>
+<div id="banner" hidden aria-live="polite"></div><div id="panel" hidden></div><div id="hint" aria-hidden="true"></div>
+<div id="tl" role="toolbar" aria-label="Settings"><div id="langwrap"><button id="langb" class="pill"></button><div id="langs" hidden></div></div><button id="theme" class="pill sq" aria-label="Toggle Theme"></button><button id="fs" class="pill sq" aria-label="Fullscreen"></button><button id="replay" class="pill sq" aria-label="Replay"></button></div>
+<nav id="bl" aria-label="Section navigation" hidden>
+<button id="prev" class="nav-btn" type="button" hidden></button>
+<div id="steps" hidden role="progressbar" aria-valuemin="1" aria-valuemax="4"><i></i><i></i><i></i><i></i></div><span id="stepLabel"></span>
+<button id="next" class="nav-btn" type="button" hidden></button>
+</nav>
+<div id="rotate" role="alertdialog" aria-live="assertive"><svg class="rotate-ico" viewBox="0 0 64 64" aria-hidden="true"><rect class="ph" x="22" y="10" width="20" height="36" rx="4"/></svg><h2 id="rotateTitle">Please rotate your device</h2></div>
+<button id="devSkip" class="btn" type="button" hidden>DEV · Skip ›</button>
+<div id="logo"><img src="assets/img/ConveGenius-logo-dark.webp" alt="ConveGenius.AI" class="logo-img" data-logo></div>
+<div id="load"><svg class="room" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M620.0 330V570 M620 330.0H980 M650.0 330V570 M620 350.0H980 M680.0 330V570 M620 370.0H980 M710.0 330V570 M620 390.0H980 M740.0 330V570 M620 410.0H980 M770.0 330V570 M620 430.0H980 M800.0 330V570 M620 450.0H980 M830.0 330V570 M620 470.0H980 M860.0 330V570 M620 490.0H980 M890.0 330V570 M620 510.0H980 M920.0 330V570 M620 530.0H980 M950.0 330V570 M620 550.0H980 M980.0 330V570 M620 570.0H980 M620.0 570L0.0 900 M620.0 330L0.0 0 M620 330.0L0 0.0 M980 330.0L1600 0.0 M650.0 570L133.3 900 M650.0 330L133.3 0 M620 350.0L0 75.0 M980 350.0L1600 75.0 M680.0 570L266.7 900 M680.0 330L266.7 0 M620 370.0L0 150.0 M980 370.0L1600 150.0 M710.0 570L400.0 900 M710.0 330L400.0 0 M620 390.0L0 225.0 M980 390.0L1600 225.0 M740.0 570L533.3 900 M740.0 330L533.3 0 M620 410.0L0 300.0 M980 410.0L1600 300.0 M770.0 570L666.7 900 M770.0 330L666.7 0 M620 430.0L0 375.0 M980 430.0L1600 375.0 M800.0 570L800.0 900 M800.0 330L800.0 0 M620 450.0L0 450.0 M980 450.0L1600 450.0 M830.0 570L933.3 900 M830.0 330L933.3 0 M620 470.0L0 525.0 M980 470.0L1600 525.0 M860.0 570L1066.7 900 M860.0 330L1066.7 0 M620 490.0L0 600.0 M980 490.0L1600 600.0 M890.0 570L1200.0 900 M890.0 330L1200.0 0 M620 510.0L0 675.0 M980 510.0L1600 675.0 M920.0 570L1333.3 900 M920.0 330L1333.3 0 M620 530.0L0 750.0 M980 530.0L1600 750.0 M950.0 570L1466.7 900 M950.0 330L1466.7 0 M620 550.0L0 825.0 M980 550.0L1600 825.0 M980.0 570L1600.0 900 M980.0 330L1600.0 0 M620 570.0L0 900.0 M980 570.0L1600 900.0 M608.1 323.7H991.9V576.3H608.1Z M578.6 308.0H1021.4V592.0H578.6Z M534.2 284.3H1065.8V615.7H534.2Z M476.0 253.3H1124.0V646.7H476.0Z M404.8 215.4H1195.2V684.6H404.8Z M321.2 170.9H1278.8V729.1H321.2Z M225.6 120.1H1374.4V779.9H225.6Z M118.4 63.0H1481.6V837.0H118.4Z"/></svg><div class="load-box"><img src="assets/img/ConveGenius-logo-dark.webp" alt="ConveGenius.AI" class="load-logo" data-logo><div class="load-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="loadBar"></i></div><span id="loadText" role="status">Loading…</span><button id="loadRetry" class="btn" type="button" hidden onclick="location.reload()">Retry</button></div></div>
+<div id="tourOverlay" class="tour-overlay" hidden>
+<div id="tourSpotlight" class="tour-spotlight"></div>
+<div id="tourTooltip" class="tour-tooltip" role="dialog" aria-live="polite">
+<div id="tourProgress" class="tour-tooltip-progress"></div>
+<div id="tourTitle" class="tour-tooltip-title"></div>
+<div id="tourBody" class="tour-tooltip-body"></div>
+<div class="tour-tooltip-footer">
+<button id="tourSkipBtn" class="tour-skip-btn"></button>
+<div class="tour-tooltip-nav">
+<button id="tourBackBtn" class="tour-nav-btn">Back</button>
+<button id="tourNextBtn" class="tour-nav-btn tour-nav-btn-primary">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- SwiftPAL Platform Bridge: copied unchanged from the FLN math games (MT01A01_L05_S02/index.html). Declares the bare top-level
+     const SwiftPAL used by js/xapi.js (SwiftPAL.sendEvent). Do not edit here; update it from the source when the bridge changes. -->
+<script>
+/**
+ * SwiftPAL Platform Bridge
+ * =========================
+ * Single dispatcher for all native ↔ JS communication.
+ * Injected inline into every activity HTML by render.js (%%SWIFTPAL_BRIDGE%%).
+ *
+ * PLATFORMS SUPPORTED
+ *   android   — window.Android JavascriptInterface
+ *   ios       — window.webkit.messageHandlers.swiftpal (WKWebView)
+ *   web       — window.parent / window.opener postMessage (iframe / React)
+ *   electron  — window.opener postMessage
+ *
+ * PUBLIC API
+ *   SwiftPAL.sendEvent(payload)              → fire-and-forget event (used by EventBus)
+ *   SwiftPAL.invoke(name, ...args)           → call any native function by name
+ *   SwiftPAL.query(name, timeout, ...args)   → call native, await callback with result
+ *   SwiftPAL.platform                        → detected platform string
+ *
+ * ANDROID CALLBACK PATTERN (for query())
+ *   Android receives resolverId as last arg, then calls back:
+ *     webView.evaluateJavascript(
+ *       "window.__swiftpalResolvers['RESOLVER_ID'] && " +
+ *       "window.__swiftpalResolvers['RESOLVER_ID']('" + result + "')", null
+ *     );
+ *   Each call gets a unique resolverId so parallel queries never collide.
+ */
+const SwiftPAL = (function () {
+
+  /* ── Platform detection ── */
+  const PLATFORM =
+    (window.Android && typeof window.Android.sendEvent === 'function') ? 'android' :
+    (window.webkit?.messageHandlers?.swiftpal)                         ? 'ios'     :
+    (window.parent !== window)                                          ? 'web'     :
+    (window.opener)                                                     ? 'electron':
+                                                                          'web';
+
+  /* ── Resolver map for query() callbacks ──
+     Keyed by unique resolverId so parallel in-flight queries never collide.
+     Android (or any native side) resolves a specific Promise by calling:
+       window.__swiftpalResolvers['<id>']('<result>')                       */
+  window.__swiftpalResolvers = window.__swiftpalResolvers || {};
+
+  /* ═══════════════════════════════════════════════════════════════
+     CORE DISPATCHER
+     Routes a function call to the correct native channel.
+     name  = method name on the native side
+     args  = arguments to forward
+     ═══════════════════════════════════════════════════════════════ */
+  function _call(name, args) {
+    try {
+      switch (PLATFORM) {
+
+        case 'android':
+          /* JavascriptInterface — each method called by name directly.
+             All args are forwarded; for sendEvent the payload is already
+             a JSON string at this point.                                  */
+          if (window.Android && typeof window.Android[name] === 'function') {
+            window.Android[name](...args);
+          } else {
+            console.warn(`[SwiftPAL Bridge] Android.${name} not found`);
+          }
+          break;
+
+        case 'ios':
+          /* WKWebView messageHandlers — wraps name + args into one object */
+          window.webkit.messageHandlers.swiftpal.postMessage({ fn: name, args });
+          break;
+
+        case 'android':   /* already handled above — unreachable but explicit */
+          break;
+
+        case 'web':
+        case 'electron':
+        default:
+          /* iframe / React web / Electron — postMessage to parent or opener */
+          const target = window.parent !== window ? window.parent
+                       : window.opener             ? window.opener
+                       : null;
+          if (target) {
+            target.postMessage({ source: 'swiftpal', fn: name, args }, '*');
+          }
+          break;
+      }
+    } catch (e) {
+      console.warn(`[SwiftPAL Bridge] _call error for ${name}:`, e);
+    }
+
+    /* Always fire a local CustomEvent regardless of platform —
+       lets in-page analytics / debug tools observe every call  */
+    try {
+      window.dispatchEvent(new CustomEvent(`swiftpal:${name}`, {
+        detail: { fn: name, args }
+      }));
+    } catch (e) { /* ignore */ }
+
+    console.log(`[SwiftPAL Bridge] ${PLATFORM}.${name}`, ...args);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PUBLIC API
+     ═══════════════════════════════════════════════════════════════ */
+  return {
+
+    /** Detected platform — 'android' | 'ios' | 'web' | 'electron' */
+    platform: PLATFORM,
+
+    /**
+     * sendEvent(payload)
+     * Fire-and-forget — used by EventBus for all xAPI events.
+     * payload is serialised to JSON before dispatch.
+     */
+    sendEvent(payload) {
+      _call('sendEvent', [JSON.stringify(payload)]);
+    },
+
+    /**
+     * invoke(name, ...args)
+     * Generic fire-and-forget call to any native function by name.
+     * e.g. SwiftPAL.invoke('logError', 'Something went wrong')
+     */
+    invoke(name, ...args) {
+      _call(name, args);
+    },
+
+    /**
+     * query(name, timeout = 5000, ...args)
+     * Call a native function and await its async response.
+     * Each call gets a unique resolverId so parallel calls never collide.
+     *
+     * ANDROID IMPLEMENTATION:
+     *   @JavascriptInterface
+     *   fun getProgress(resolverId: String) {
+     *     val result = ...compute...
+     *     webView.post {
+     *       webView.evaluateJavascript(
+     *         "window.__swiftpalResolvers['$resolverId'] && " +
+     *         "window.__swiftpalResolvers['$resolverId']('$result')", null
+     *       )
+     *     }
+     *   }
+     *
+     * JS USAGE:
+     *   const progress = await SwiftPAL.query('getProgress');
+     *   const [prog, uid] = await Promise.all([
+     *     SwiftPAL.query('getProgress'),
+     *     SwiftPAL.query('getUserId'),
+     *   ]);
+     */
+    query(name, timeout = 5000, ...args) {
+      return new Promise((resolve, reject) => {
+        /* Unique id — timestamp + random suffix prevents collision
+           even when the same function is queried in parallel        */
+        const id = `${name}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+        /* Register resolver — Android calls back with this id */
+        window.__swiftpalResolvers[id] = (result) => {
+          clearTimeout(timer);
+          delete window.__swiftpalResolvers[id];
+          resolve(result);
+        };
+
+        /* Timeout guard — prevents hanging Promises if native never responds */
+        const timer = setTimeout(() => {
+          if (window.__swiftpalResolvers[id]) {
+            delete window.__swiftpalResolvers[id];
+            reject(new Error(`[SwiftPAL Bridge] query('${name}') timed out after ${timeout}ms`));
+          }
+        }, timeout);
+
+        /* Forward call with resolverId appended as last arg */
+        _call(name, [...args, id]);
+      });
+    }
+
+  };
+
+})();
+
+</script>
+<script type="module" src="js/main.js" onerror="bootFail()"></script></body></html>
