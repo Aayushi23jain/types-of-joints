@@ -194,6 +194,6 @@ export class Tour {
     // the toolbar stays above the tour mask (enabled, clickable): on small screens start the card below it instead of under it, and let
     // it scroll inside if the rest of the screen is too short
     const y = belowToolbar(this.tooltip);
-    if (y) { this.tooltip.style.top = y + 'px'; this.tooltip.style.transform = 'translateX(-50%)'; this.tooltip.style.maxHeight = (innerHeight - y - 8) + 'px'; }
+    if (y) { this.tooltip.style.top = y + 'px'; this.tooltip.style.transform = 'translateX(-50%)'; this.tooltip.style.maxHeight = (innerHeight - y - Math.max(20, innerHeight * .05)) + 'px'; }   // clear gap at the bottom: the card never touches the screen edge, its content scrolls inside
   }
 }

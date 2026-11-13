@@ -327,9 +327,15 @@ function labels(selected = null) {
   // Smoothness: no raycasting and no layout reads per frame; a dot hides behind the body GRADUALLY (sc.occlusion, 0..1): the dot fades +
   // shrinks and its line slides out to the body's edge in step with it; labels glide (never jump) when they change side or stack order.
   // Labels themselves are ALWAYS fully opaque (demo): never dimmed, even when the joint is behind the model.
-  let frameNo = 0;
+  let frameNo = 0, tops = [];
   sc.onFrame.fn = () => {
-    if (frameNo++ % 45 === 0) items.forEach(it => { it.w = it.el.offsetWidth || 90; it.h = it.el.offsetHeight || 22; });   // sizes cached: reading them every frame forced a layout per label
+    if (frameNo++ % 45 === 0) {                                                          // sizes cached: reading them every frame forced a layout per label
+      items.forEach(it => { it.w = it.el.offsetWidth || 90; it.h = it.el.offsetHeight || 22; });
+      // top chrome (toolbar, instruction, title): a label stack only starts below the parts that are really above it, so a label
+      // next to a high joint (Fixed, on the skull) stays level with its dot - straight line - when that corner is free
+      tops = ['#tl', '#banner', '#identity'].map(s => $(s)).filter(e => e && !e.hidden && e.getClientRects().length)
+        .map(e => e.getBoundingClientRect()).filter(r => r.height && r.top < innerHeight / 3);
+    }
     const rows = { '-1': [], '1': [] };
     items.forEach(it => {
       const a = sc.dotPos(it.k), p = it.p = sc.project(a);
@@ -353,7 +359,9 @@ function labels(selected = null) {
     for (const s of [-1, 1]) {
       const side = rows[s].sort((a, b) => a.p.y - b.p.y);
       const hits = card && side.some(it => { const x = it.p.x + s * (sideGap + it.w / 2); return x - it.w / 2 < pr.right && x + it.w / 2 > pr.left; });
-      const top = Math.max(innerWidth <= 820 ? 112 : 92, hits && card === 'top' ? pr.bottom + 8 : 0);
+      const xs = side.map(it => it.p.x + s * (sideGap + it.w / 2)), x0 = Math.min(...xs.map((x, i) => x - side[i].w / 2)), x1 = Math.max(...xs.map((x, i) => x + side[i].w / 2));
+      const chrome = tops.reduce((m, r) => r.left < x1 + 8 && r.right > x0 - 8 ? Math.max(m, r.bottom + 8) : m, 8);
+      const top = Math.max(chrome, hits && card === 'top' ? pr.bottom + 8 : 0);
       const bottom = hits && card === 'bottom' ? pr.top - 8 : innerHeight - 84;
       const minX = card === 'left' ? pr.right + 8 : 0;                                  // left column (desktop / phone landscape): pills stay to its right
       const heights = side.map(it => it.h);
