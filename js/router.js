@@ -7,7 +7,7 @@ import { t, say, stopAudio, OPUS } from './audio.js';
 import { $, E, banner, panel, btn } from './dom.js';
 import * as sc from './scene.js';
 import { Tour } from './tour.js';
-import { startTryIt, finish as finishTryIt } from './studentFlow.js';
+import { startTryIt, finish as finishTryIt, resetTryIt } from './studentFlow.js';
 import { openSort, sortDone } from './sort.js';
 import { sfx } from './sfx.js';
 import { fsSupported, isFullscreen, docFullscreen, isIOS, enterFullscreen, exitFullscreen, onFullscreenChange, standalone } from './fullscreen.js';
@@ -239,7 +239,7 @@ export const startFlow = () => {
 function resetProgress() {
   state.seen = new Set(); state.quiz = null; setScore(0);
   state.sorted = {}; state.sortOrder = null; state.sortTries = {}; state.sortUi = null;
-  pred = null; state.welcomed = false;
+  pred = null; quietOnce = false; state.welcomed = false; resetTryIt();
 }
 export const replayStudentFlow = () => {
   if (!state.startDone) return;

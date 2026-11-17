@@ -11,10 +11,16 @@ import * as sc from './scene.js';
 import { XAPI, screen as xScreen, question as xQuestion, tapObj } from './xapi.js';
 
 const MOVES = [['tryMove1', 'head'], ['tryMove2', 'elbow'], ['tryMove3', 'circle']];   // tile text + skeleton demo
-let onDone = null, step = 0, done = new Set(), answer = null, playing = null;
+let onDone = null, step = 0, done = new Set(), answer = null, playing = null, dog = 0;
+
+// Replay / Play again: forget everything from the last run (ticked moves, the answer, a move still playing + its watchdog),
+// so nothing from the old run can tick a move or unlock Next in the new one.
+export function resetTryIt() {
+  clearTimeout(dog); dog = 0; onDone = null; step = 0; done = new Set(); answer = null; playing = null; chalTries = 0;
+}
 
 export function startTryIt(cb) {
-  onDone = cb; step = 0; done = new Set(); answer = null; playing = null;
+  resetTryIt(); onDone = cb;
   state.redo = () => render(true);                          // language change -> redraw + read again
   sc.frameUpper(1400);
   render(true);
@@ -49,8 +55,8 @@ function moves(p, read) {
         sfx(done.size === MOVES.length ? 'sparkle' : 'correct');                     // all three moves seen -> sparkle
         render(false);
       };
-      const dog = setTimeout(ticked, sc.DEMO_MS[name] + 2500);   // watchdog: never stuck if the animation loop pauses (hidden tab)
-      sc.demo(name, ticked);                                    // the tile is ticked once the skeleton has shown the move
+      clearTimeout(dog); dog = setTimeout(ticked, sc.DEMO_MS[name] + 2500);   // watchdog: never stuck if the animation loop pauses (hidden tab)
+      const run = onDone; sc.demo(name, () => { if (onDone === run) ticked(); });   // the tile is ticked once the skeleton has shown the move
     };
   });
   const next = btn(p, t('tNext'), () => { sc.demo(null); step = 1; render(true); });
